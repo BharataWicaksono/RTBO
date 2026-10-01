@@ -1,4 +1,4 @@
-﻿using BIG.NETCORE.Database.SqlServer;
+using BIG.NETCORE.Database.SqlServer;
 using BIG.NETCORE.Integration;
 using BIG.NETCORE.Logger;
 using Newtonsoft.Json.Linq;
@@ -154,7 +154,7 @@ namespace BIG.INTEGRATION.SERVER.Context
                 //ApiClient apiClient = AllSetting.apiClients.FirstOrDefault(f => f.NAME == "BANKINSTRUCTION");
                 //if (apiClient == null) return;
 
-                //string Uri = apiClient.URI; //"http://172.20.1.40:5000/bca/auto/";
+                //string Uri = apiClient.URI; 
                 //using (var client = new HttpClient())
                 //{
                 //    client.Timeout = TimeSpan.FromSeconds(5);
@@ -282,15 +282,14 @@ namespace BIG.INTEGRATION.SERVER.Context
             {
                 //List<string> CC = new List<string>();
                 //CC.AddRange(AllSetting.email.CC.Split('|'));
-                //var fromAddress = new MailAddress(AllSetting.email.FROM, "OCBC Sekuritas Indonesia");
+                //var fromAddress = new MailAddress(AllSetting.email.FROM, "");
                 //var toAddress = new MailAddress(AllSetting.email.TO, AllSetting.email.TO);
                 //var smtp = new SmtpClient
                 //{
-                //    //Host = "192.168.0.207",
-                //    Host = AllSetting.email.SMTP,//"mail01.ocbcsekuritas.com",
-                //    Port = AllSetting.email.PORT,//25,
+                //    Host = AllSetting.email.SMTP,
+                //    Port = AllSetting.email.PORT,
                 //    DeliveryMethod = SmtpDeliveryMethod.Network,
-                //    Credentials = new NetworkCredential(AllSetting.email.USER, AllSetting.email.PASSWORD, AllSetting.email.DOMAIN)//"enquiries", "0cbc1234!", "ocbcsekuritas.com"),
+                //    Credentials = new NetworkCredential(AllSetting.email.USER, AllSetting.email.PASSWORD, AllSetting.email.DOMAIN)
                 //};
                 //StringBuilder sb = new StringBuilder();
                 //sb.AppendLine("<html>Share Withdrawal for Margin Customer")
@@ -326,15 +325,14 @@ namespace BIG.INTEGRATION.SERVER.Context
                 //    {
                 //        List<string> CC = new List<string>();
                 //        CC.AddRange(AllSetting.email.CC.Split('|'));
-                //        var fromAddress = new MailAddress(AllSetting.email.FROM, "OCBC Sekuritas Indonesia");
+                //        var fromAddress = new MailAddress(AllSetting.email.FROM, "");
                 //        var toAddress = new MailAddress(AllSetting.email.TO, AllSetting.email.TO);
                 //        var smtp = new SmtpClient
                 //        {
-                //            //Host = "192.168.0.207",
-                //            Host = AllSetting.email.SMTP,//"mail01.ocbcsekuritas.com",
-                //            Port = AllSetting.email.PORT,//25,
+                //            Host = AllSetting.email.SMTP,
+                //            Port = AllSetting.email.PORT,
                 //            DeliveryMethod = SmtpDeliveryMethod.Network,
-                //            Credentials = new NetworkCredential(AllSetting.email.USER, AllSetting.email.PASSWORD, AllSetting.email.DOMAIN)//"enquiries", "0cbc1234!", "ocbcsekuritas.com"),
+                //            Credentials = new NetworkCredential(AllSetting.email.USER, AllSetting.email.PASSWORD, AllSetting.email.DOMAIN)
                 //        };
 
                 //        StringBuilder sb = new StringBuilder();
