@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 using BIG.NETCORE.Integration;
 using BIG.INTEGRATION.SERVER;
 using BIG.INTEGRATION.SERVER.Context;
@@ -10,7 +10,6 @@ using Microsoft.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using BIG.INTEGRATION.SERVER.Data;
 using BIG.NETCORE.Database.SqlServer;
 
 
@@ -22,13 +21,12 @@ LogWriter logWriter;
 IntegrationContext context;
 Thread tmrThread, logThread, tickThread;
 StringBuilder sbTableHome = new StringBuilder();
-bool isFirstIntradayRunning = false;
 bool IsBoDbConnected = false;
 bool IsFoDbConnected = false;
 int[] ports;
 string ip = string.Empty;
 string ext = "BIG";
-BIG.NETCORE.WebServer.HttpServerListener httpServer = null;
+HttpServerListener httpServer = null;
 
 prevDate = DateTime.Now;
 Helper.SetLogFullName(prevDate);
@@ -52,15 +50,6 @@ if (Helper.isSqlServerConnect(Helper.BIGConnectionString.Value) == false)
     Console.ReadLine();
     return;
 }
-
-//Console.WriteLine("Test Connection " + Helper.FOConnectionString.Value);
-//if (Helper.isPostgresSqlConnect(Helper.FOConnectionString.Value) == false)
-//{
-//    Console.WriteLine("FO Connection fail to connect, Please check " + Helper.FOCS + "!");
-//    Console.WriteLine(Helper.GetErrorPostgresSqlConnect(Helper.FOConnectionString.Value));
-//    Console.ReadLine();
-//    return;
-//}
 
 Exception exception = AllSetting.LoadSetting();
 if (exception != null)
@@ -94,9 +83,6 @@ if (AllSetting.setting.LOGDATABASE)
         logWriter.ClearLog(Helper.BIG_HOUSEKEEPING_LOG);
     }
 }
-
-logWriter.HouseKeeping(Helper.BOConnectionString.Value, Helper.BIG_HOUSEKEEPING);
-logWriter.HouseKeeping(Helper.FOConnectionString.Value, Helper.BIG_HOUSEKEEPING);
 
 #region WebServer
 if (ports.Length > 0)
@@ -252,51 +238,6 @@ if (ports.Length > 1)
 }
 #endregion
 
-#region BO API
-//string BoServerName = "BO";
-//HttpServerListener BoApi = new HttpServerListener(2781, BoServerName, AuthenticationSchemes.Basic, "S21BIG", "Jakarta123");
-//BoApi.OnContentReceived += BoApi_OnContentReceived;
-//BoApi.OnErrorReceived += BoApi_OnErrorReceived;
-
-//void BoApi_OnErrorReceived(string Uri, HttpListenerContext Context, string Message, string Stacktrace)
-//{
-//    string[] split = Uri.Split('/');
-//    if (split[0].ToUpper() == BoServerName)
-//    {
-//        logWriter.AddLog(LogType.ERROR, $"Executing {BoServerName} -> FO Copy [{split[2]}] {Message}!");
-//        BoApi.Response(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(new Response { Message = Message })), Context.Request, string.Empty, HttpStatusCode.Unauthorized, $"Request Login Failed, Please check user dan password!");
-//    }
-//}
-
-//void BoApi_OnContentReceived(string Uri, HttpListenerContext Context, string Content)
-//{
-//    string[] split = Uri.Split('/');
-//    if (split[0].ToUpper() == BoServerName)
-//    {
-//        TimestampName name = Helper.GetEnumByName<TimestampName>(split[2]);
-//        if (name == TimestampName.UNKNOWN)
-//        {
-//            logWriter.AddLog(LogType.ERROR, $"Executing {BoServerName} -> FO Copy [{split[2]}] not Found!");
-//            BoApi.Response(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(new Response { Message = $"Request params {split[2]} not Found!" })), Context.Request, string.Empty, HttpStatusCode.NotFound, $"Request params {split[2]} not Found!");
-//            return;
-//        }
-//        else
-//        {
-//            logWriter.AddLogContentHide(LogType.INFO, $"Executing {BoServerName} -> FO Copy [{split[2]}]", Content);
-//            BoApi.Response(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(new Response { Message = $"Request params {split[2]} Success" })), Context.Request, string.Empty);
-//            context.CopyToFo(Helper.GetEnumByName<OpCode>(split[1]), Helper.GetEnumByName<TimestampName>(split[2]), DestinationType.DATABASE, Content);
-
-//        }
-//    }
-//    else
-//    {
-//        logWriter.AddLog(LogType.ERROR, $"Request Uri [{Uri}] not Found!");
-//        BoApi.Response(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(new Response { Message = $"Request Uri {Uri} not Found!" })), Context.Request, string.Empty, HttpStatusCode.NotFound, $"Request Uri [{Uri}] not Found!");
-//    }
-//}
-//BoApi.startServer();
-#endregion
-
 logWriter.AddLog(LogType.INFO, "Application Started...");
 running = true;
 tmrThread = new Thread(async () =>
@@ -386,28 +327,7 @@ tmrThread = new Thread(async () =>
                 }
             }
         }
-
-        //Check Unsending Message
-        if (_isNewStart == false && AllSetting.intradays[0].START <= DateTime.Now.TimeOfDay && DateTime.Now.TimeOfDay < AllSetting.intradays[0].STOP)
-        {
-            //if (isFirstIntradayRunning == false)
-            //{
-            //    isFirstIntradayRunning = true;
-
-            if (context.ctxBO.IsUseServiceBroker)
-            {
-                Exception erBO = await context.ctxBO.SendDataIntradayPending(Helper.GET_LOGAPI);
-                if (erBO != null) logWriter.AddLog(LogType.ERROR, erBO.Message, erBO.StackTrace);
-            }
-
-            if (context.ctxFO.IsUseServiceBroker)
-            {
-                Exception erRT = await context.ctxFO.SendDataIntradayPending(Helper.GET_LOGAPI);
-                if (erRT != null) logWriter.AddLog(LogType.ERROR, erRT.Message, erRT.StackTrace);
-            }
-            //}
-        }
-
+       
         _isNewStart = false;
         Exception error = AllSetting.SaveAllTimestamp();
         if (error != null)
@@ -470,58 +390,6 @@ tmrThread.Start();
 tickThread.Start();
 Console.ReadLine();
 
-void Shutdown()
-{
-    running = false;
-
-    if (tmrThread != null)
-    {
-        tmrThread.Join();
-        tmrThread = null;
-    }
-
-    if (context != null)
-        context.StopQueue();
-
-    if (logThread != null)
-    {
-        logThread.Join();
-        logThread = null;
-    }
-
-    if (tickThread != null)
-    {
-        tickThread.Join();
-        tickThread = null;
-    }
-}
-void KillAllThread(bool status)
-{
-    running = false;
-
-    if (tmrThread != null)
-    {
-        tmrThread.Abort();
-        tmrThread = null;
-    }
-
-    if (context != null)
-        context.KillQueue();
-
-    if (logThread != null)
-    {
-        logThread.Abort();
-        logThread = null;
-    }
-
-    if (tickThread != null)
-    {
-        tickThread.Abort();
-        tickThread = null;
-    }
-
-    if (status) Environment.Exit(0);
-}
 void Restart(HttpListenerContext HttpContext, HttpListenerRequest request)
 {
     if (httpServer == null)
