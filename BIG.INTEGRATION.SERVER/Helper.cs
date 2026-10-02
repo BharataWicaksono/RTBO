@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -28,12 +28,6 @@ namespace BIG.INTEGRATION.SERVER
     }
     public static class Helper
     {
-        public static readonly string QUERY = "SELECT ID FROM [BIG].[LogApi]";//Query Service Broker
-        public static readonly string QUERY_GET_DATA = "SELECT CAST(ID AS BIGINT) AS Timestamp, [Table] FROM [BIG].LogApi WHERE CAST(ID AS BIGINT) > @Timestamp ORDER BY ID";//Query onChange -> onDataReceived
-        public static readonly string QUERY_GET_BO_DBTS = "SELECT Timestamp FROM DBTS WHERE [Key] = 'BO'";//Get Timestamp terkahir Buat DB BO
-        public static readonly string QUERY_GET_RT_DBTS = "SELECT Timestamp FROM DBTS WHERE [Key] = 'FO'";//Get Timestamp terkahir Buat DB RT
-        public static readonly string GET_LOGAPI = "[dbo].GET_LOGAPI";// SP buat cek pendingan data yg tidak terkirim
-
         public static readonly string ADD_LOGMESSAGE = "ADD_LOGMESSAGE";
         public static readonly string BIG_HOUSEKEEPING_LOG = "[HOUSEKEEPING]";
         public static readonly string BIG_HOUSEKEEPING = "[dbo].[HOUSEKEEPING]";
@@ -163,22 +157,6 @@ namespace BIG.INTEGRATION.SERVER
             //FilesImport = FilesImport.Where(w => !w.EndsWith("000000.csv")).ToArray();
             Array.Sort(FilesImport, StringComparer.InvariantCulture);
             return FilesImport;
-        }
-        //public static void Addlog(string Message)
-        //{            
-        //    Console.WriteLine(string.Format("{0}", Message));            
-        //}
-        //public static void Addlog(string DataType, string Message)
-        //{
-        //    Console.ForegroundColor = ConsoleColor.DarkCyan;
-        //    Console.WriteLine(string.Format("{0} {1}", DataType, Message));
-        //    Console.ForegroundColor = ConsoleColor.White;
-        //}
-        //public static void Addlog(string DataType, string Message, string Stacktrace)
-        //{
-        //    Console.ForegroundColor = ConsoleColor.DarkRed;
-        //    Console.WriteLine(string.Format("{0} {1}{2}{3}", DataType, Message, Environment.NewLine, Stacktrace));
-        //    Console.ForegroundColor = ConsoleColor.White;
-        //}
+        }     
     }
 }
